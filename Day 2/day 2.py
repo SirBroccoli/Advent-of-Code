@@ -39,91 +39,6 @@ So, in this example, 2 reports are safe.
 Analyze the unusual data from the engineers. How many reports are safe?
 ANSWER 287
 """
-# # get the contents of the puzzle
-# with open('/home/pi/Documents/PythonFiles/Advent of Code 2024/Day 2/puzzle.txt', 'r') as f:
-#     file = [line.strip() for line in f]
-
-# # We will call two functions for every row in the puzzle
-# # the first function will test if every number decreases from the first
-# def decreases(puzzle):
-#     '''
-#     taks first element and compares the following elements
-#     each iteration should be smaller than, and not equal to
-#     returns True or False
-#     '''
-#     puzzle = puzzle.split()
-#     length_of_argument = len(puzzle)
-
-#     for i in range(0, length_of_argument-1):
-#         anum = int(puzzle[i])
-#         bnum = int(puzzle[i+1])
-#         difference = abs(anum-bnum)
-        
-#         if anum < bnum:
-#             return False
-#         elif difference > 3 or difference == 0:
-#             return False
-               
-#     return True
-
-# # this function will test if every num after the first only increases
-# def increases(puzzle):
-#     '''
-#     taks first element and compares the following elements
-#     each iteration should be greater than, and not equal to
-#     returns True or False
-#     '''
-#     puzzle = puzzle.split()
-#     length_of_argument = len(puzzle)
-
-#     for i in range(0, length_of_argument-1):
-#         anum = int(puzzle[i])
-#         bnum = int(puzzle[i+1])
-#         difference = abs(anum-bnum)
-        
-#         if anum > bnum:
-#             return False
-#         elif difference > 3 or difference == 0:
-#             return False
-               
-#     return True
-
-# def problemDampener(i, puzzle):
-#     '''
-#     Brute force removing a problem element in a list
-#     takes the previous iteration and removes the element and 
-#     reiterates over the list a second time to determine if the 
-#     levels are safe as the previous function
-#     returns True or False
-
-#     once you identify the failure,
-#     iterate over each element but...
-#     use splicing to remove one particular element
-#     Look to see if the iteration turns true because 
-#     '''
-    
-
-
-# # the number of safe reports for each row of the puzzle
-# safe = 0
-# notsafe = 0
-
-# for row in range(0, len(file)):
-#     workingrow = file[row]
-#     rowdecreases = decreases(file[row])
-#     rowincrease = increases(file[row])
-
-#     if rowincrease:
-#         print(f'increases {workingrow}')
-#         safe += 1
-#     elif rowdecreases:
-#         print(f'decreases {workingrow}')
-#         safe += 1 
-#     else:
-#         print(f'neither increases or decreases {workingrow}')
-#         notsafe += 1
-
-# print(safe, notsafe)
 
 def is_valid_sequence(file):
 
@@ -137,9 +52,9 @@ def is_valid_sequence(file):
             return False  # Difference is either 0 or greater than 3
 
         if difference < 0:
-            increasing = False  # Not increasing
+            increasing = False  
         elif difference > 0:
-            decreasing = False  # Not decreasing
+            decreasing = False  
 
     return increasing or decreasing
 
@@ -154,7 +69,43 @@ def count_valid_rows(file_path):
 
     return valid_rows
 
-# Example usage
-file_path = '/home/pi/Documents/PythonFiles/Advent of Code 2024/Day 2/puzzle.txt'
+file_path = '/home/pi/Documents/PythonFiles/Advent of Code/2024/Day 2/puzzle.txt'
 valid_rows_count = count_valid_rows(file_path)
-print(f'Number of valid rows: {valid_rows_count}')
+# print(f'Number of valid rows: {valid_rows_count}')
+
+'''
+--- Part Two ---
+The engineers are surprised by the low number of safe reports until they realize they forgot to tell you about the Problem Dampener.
+
+The Problem Dampener is a reactor-mounted module that lets the reactor safety systems tolerate a single bad level in what would otherwise be a safe report. It's like the bad level never happened!
+
+Now, the same rules apply as before, except if removing a single level from an unsafe report would make it safe, the report instead counts as safe.
+
+More of the above example's reports are now safe:
+
+7 6 4 2 1: Safe without removing any level.
+1 2 7 8 9: Unsafe regardless of which level is removed.
+9 7 6 2 1: Unsafe regardless of which level is removed.
+1 3 2 4 5: Safe by removing the second level, 3.
+8 6 4 4 1: Safe by removing the third level, 4.
+1 3 6 7 9: Safe without removing any level.
+Thanks to the Problem Dampener, 4 reports are actually safe!
+
+Update your analysis by handling situations where the Problem Dampener can remove a single level from unsafe reports. How many reports are now safe?
+'''
+
+def dampenerRedux(file_path):
+    safe_reports = 0
+
+    with open(file_path, 'r') as f:
+        for line in f:
+            number = list(map(int, line.strip().split()))
+            for i in range(len(number)):
+                if is_valid_sequence(number[:i] + number[i + 1:]):
+                    safe_reports += 1
+                    break
+
+    return safe_reports
+
+safe_reports = dampenerRedux(file_path)
+print(f'Number of safe reports: {safe_reports}')
