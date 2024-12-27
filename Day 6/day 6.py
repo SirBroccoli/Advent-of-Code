@@ -118,7 +118,7 @@ How many distinct positions will
 the guard visit before leaving the mapped area?
 '''
 
-with open('/home/pi/Documents/PythonFiles/Advent of Code 2024/Day 6/puzzle.txt', 'r') as f:
+with open('/home/pi/Documents/PythonFiles/Advent of Code/2024/Day 6/puzzle.txt', 'r') as f:
     file = [line.strip() for line in f] 
     puzzle = [list(i) for i in file]
 
@@ -273,7 +273,7 @@ while moving:
         break
 
 puzzle_mapped = [''.join(s) for s in puzzle]
-guard_map = open('/home/pi/Documents/PythonFiles/Advent of Code 2024/Day 6/puzzle_COPY.txt', 'w')
+guard_map = open('/home/pi/Documents/PythonFiles/Advent of Code/2024/Day 6/puzzle_COPY.txt', 'w')
 for i in puzzle_mapped:
     guard_map.write(i + '\n')
 
@@ -295,5 +295,4 @@ for i in puzzle_mapped:
         if j == '#':
             copy_hash += 1
 
-print(original_hash, copy_hash)
-print(tally)
+print(tally) # Answer is 4580
