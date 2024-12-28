@@ -118,9 +118,11 @@ How many distinct positions will
 the guard visit before leaving the mapped area?
 '''
 
-with open('/home/pi/Documents/PythonFiles/Advent of Code/2024/Day 6/puzzle.txt', 'r') as f:
-    file = [line.strip() for line in f] 
-    puzzle = [list(i) for i in file]
+def puzzleRead():
+    with open('/home/pi/Documents/PythonFiles/Advent of Code/2024/Day 6/puzzle.txt', 'r') as f:
+        file = [line.strip() for line in f] 
+        puzzle = [list(i) for i in file]
+    return puzzle
 
 def checkNorth(puzzle, x, y):
     '''
@@ -218,81 +220,295 @@ def moveWest(x, y):
         raise IndexError('Index Error moveWest')
     return x, y
 
-directions = ['<', '>', '^', 'V', '*']
-starting_point = [45, 47]
-test = 0
-x_position = 45
-y_positions = 47
-guard_icon = '^'
+def movingMain(puzzle):
+    '''
+    main function that moves the guard around the puzzle and around obstacles
+    Using the move functions and check functions, it alters the puzzle and shows spaces the guard has visited\n
+    Starting Position is Hardcoded as it is specific to this puzzle.\n
+    returns the puzzle\n
+    Returns a List of Lists
+    '''
+    x_position = 45
+    y_positions = 47
+    guard_icon = '^'
+    moving = True
 
-## Visual Guide to see the Guard moving and WHY DOES SHE KEEP MOVING OUT OF BOUNDS!!!! WTF
-# puzzle_mapped = [''.join(s) for s in puzzle]
-# guard_map = open('/home/pi/Documents/PythonFiles/Advent of Code 2024/Day 6/puzzle_COPY.txt', 'w')
-# for i in puzzle_mapped:
-#     guard_map.write(i + '\n')
+    # print(f'starting at Position {x_position, y_positions}') # Used for debugging back in the beginning
+    while moving:
+        try:
 
-moving = True
-turns = 1
-print(f'starting at Position {x_position, y_positions}')
-while moving:
-    try:
         # moving North
-        if guard_icon == '^':
-            puzzle[x_position][y_positions] = '*'
-            if checkNorth(puzzle, x_position, y_positions) == True:
-                x_position, y_positions = moveNorth(x_position, y_positions)
-            else:
-                guard_icon = '>'
+            if guard_icon == '^':
+                puzzle[x_position][y_positions] = '*'
+                if checkNorth(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveNorth(x_position, y_positions)
+                else:
+                    guard_icon = '>'
         
         # Moving East
-        elif guard_icon == '>':
-            puzzle[x_position][y_positions] = '*'
-            if checkEast(puzzle, x_position, y_positions) == True:
-                x_position, y_positions = moveEast(x_position, y_positions)
-            else:
-                guard_icon = 'v'
+            elif guard_icon == '>':
+                puzzle[x_position][y_positions] = '*'
+                if checkEast(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveEast(x_position, y_positions)
+                else:
+                    guard_icon = 'v'
 
         # Moving South
-        elif guard_icon == 'v':
-            puzzle[x_position][y_positions] = '*'
-            if checkSouth(puzzle, x_position, y_positions) == True:
-                x_position, y_positions = moveSouth(x_position, y_positions)
-            else:
-                guard_icon = '<'
+            elif guard_icon == 'v':
+                puzzle[x_position][y_positions] = '*'
+                if checkSouth(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveSouth(x_position, y_positions)
+                else:
+                    guard_icon = '<'
 
         # Moving West
-        elif guard_icon == '<':
-            puzzle[x_position][y_positions] = '*'
-            if checkWest(puzzle, x_position, y_positions) == True:
-                x_position, y_positions = moveWest(x_position, y_positions)
-            else:
-                guard_icon = '^'
+            elif guard_icon == '<':
+                puzzle[x_position][y_positions] = '*'
+                if checkWest(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveWest(x_position, y_positions)
+                else:
+                    guard_icon = '^'
     
-    except IndexError:
-        moving = False
-        break
+        except IndexError:
+            moving = False
+            break
 
-puzzle_mapped = [''.join(s) for s in puzzle]
-guard_map = open('/home/pi/Documents/PythonFiles/Advent of Code/2024/Day 6/puzzle_COPY.txt', 'w')
-for i in puzzle_mapped:
-    guard_map.write(i + '\n')
+    return puzzle
 
-tally = 0
-for i in puzzle_mapped:
-    for j in i:
-        if j in directions:
-            tally += 1
+def mapGuardPositionsToText(puzzle):
+    puzzle_mapped = [''.join(s) for s in puzzle]
+    guard_map = open('/home/pi/Documents/PythonFiles/Advent of Code/2024/Day 6/puzzle_COPY.txt', 'w')
+    for i in puzzle_mapped:
+        guard_map.write(i + '\n')
+    return puzzle_mapped
+def uniquePositions(puzzle_mapped):
+    directions = ['<', '>', '^', 'V', '*']
+    tally = 0
+    for i in puzzle_mapped:
+        for j in i:
+            if j in directions:
+                tally += 1
+    return tally
 
-original_hash = 0
-copy_hash = 0
 
-for i in puzzle:
-    for j in i:
-        if j == '#':
-            original_hash += 1
-for i in puzzle_mapped:
-    for j in i:
-        if j == '#':
-            copy_hash += 1
-
+# Run the Main Function
+puzzle = puzzleRead()
+puzzle = movingMain(puzzle)
+puzzle_mapped = mapGuardPositionsToText(puzzle)
+tally = uniquePositions(puzzle_mapped)
 print(tally) # Answer is 4580
+
+'''
+--- Part Two ---
+While The Historians begin working around the guard's patrol route, 
+you borrow their fancy device and step outside the lab. 
+From the safety of a supply closet, 
+you time travel through the last few months and record the nightly status
+ of the lab's guard post on the walls of the closet.
+
+Returning after what seems like only a few seconds to The Historians, 
+they explain that the guard's patrol area is simply too large for them 
+to safely search the lab without getting caught.
+
+Fortunately, they are pretty sure that adding a single new obstruction 
+won't cause a time paradox. They'd like to place the new obstruction in 
+such a way that the guard will get stuck in a loop, making the rest of 
+the lab safe to search.
+
+To have the lowest chance of creating a time paradox, The Historians 
+would like to know all of the possible positions for such an obstruction. 
+The new obstruction can't be placed at the guard's starting position - the 
+guard is there right now and would notice.
+
+In the above example, there are only 6 different positions where a new 
+obstruction would cause the guard to get stuck in a loop. The diagrams of 
+these six situations use O to mark the new obstruction, | to show a 
+position where the guard moves up/down, - to show a position where the 
+guard moves left/right, and + to show a position where the guard moves 
+both up/down and left/right.
+
+Option one, put a printing press next to the guard's starting position:
+
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+....|..#|.
+....|...|.
+.#.O^---+.
+........#.
+#.........
+......#...
+Option two, put a stack of failed suit prototypes in the bottom right quadrant of the mapped area:
+
+
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+......O.#.
+#.........
+......#...
+Option three, put a crate of chimney-squeeze prototype fabric next to the standing desk in the bottom right quadrant:
+
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+.+----+O#.
+#+----+...
+......#...
+Option four, put an alchemical retroencabulator near the bottom left corner:
+
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+..|...|.#.
+#O+---+...
+......#...
+Option five, put the alchemical retroencabulator a bit to the right instead:
+
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+....|.|.#.
+#..O+-+...
+......#...
+Option six, put a tank of sovereign glue right next to the tank of universal solvent:
+
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+.+----++#.
+#+----++..
+......#O..
+It doesn't really matter what you choose to use as an obstacle so 
+long as you and The Historians can put it into position without 
+the guard noticing. The important thing is having enough options 
+that you can find one that minimizes time paradoxes, and in this 
+example, there are 6 different positions you could choose.
+
+You need to get the guard stuck in a loop by adding a single new 
+obstruction. How many different positions could you choose for 
+this obstruction?
+'''
+
+def movingPartTwo(puzzle):
+    '''
+    A Copy of the movingMain function but with a few changes\n
+    This function will similarly move the guard around the puzzle and around obstacles
+    however, it now returns True if the guard sucessfully enters a infinite loop.
+    # This function will not alter the original argument text file\n
+    Returns True if Infinite Loop\n
+    returns False if the guard leaves the puzzle\n
+    '''
+    x_position = 45
+    y_positions = 47
+    guard_icon = '^'
+    moving = True
+    # puzzle_copy = puzzle.copy()
+    while moving:
+        try:
+
+        # moving North
+            if guard_icon == '^':
+                puzzle[x_position][y_positions] = '*'
+                if checkNorth(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveNorth(x_position, y_positions)
+                    print(f'Moved North {x_position, y_positions}')
+                else:
+                    # Stayed in place and looked East
+                    guard_icon = '>'
+        
+        # Moving East
+            elif guard_icon == '>':
+                puzzle[x_position][y_positions] = '*'
+                if checkEast(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveEast(x_position, y_positions)
+                    print(f'Moved East {x_position, y_positions}')
+                else:
+                    # Stayed in place and looked South
+                    guard_icon = 'v'
+
+        # Moving South
+            elif guard_icon == 'v':
+                puzzle[x_position][y_positions] = '*'
+                if checkSouth(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveSouth(x_position, y_positions)
+                    print(f'Moved South {x_position, y_positions}')
+                else:
+                    # Stayed in place and looked West
+                    guard_icon = '<'
+
+        # Moving West
+            elif guard_icon == '<':
+                puzzle[x_position][y_positions] = '*'
+                if checkWest(puzzle, x_position, y_positions) == True:
+                    x_position, y_positions = moveWest(x_position, y_positions)
+                    print(f'Moved West {x_position, y_positions}')
+                else:
+                    # Stayed in place and looked North
+                    ## TODO
+                    # MARK THIS POSITION AS THE START OF AN INFINITE LOOP
+                    # WE CAN DETERMINE IF THE GUARD VISITS THIS EXACT SPOT AGAIN 
+                    # A SET NUMBER OF TIMES,
+                    # IF HE DOES, THEN WE KNOW HE IS IN AN INFINITE LOOP
+                    # RETURN TRUE
+                    guard_icon = '^'
+    
+        except IndexError:
+            moving = False
+            return False
+    # return True
+
+
+def addingObstacles(puzzle):
+    '''
+    //// TO DO /////
+    WE CAN ALTER OUR OBSTACLES TO START ON A KNOWN USED POSITION TO SAVE TIME 
+    BUT WHO CARES ABOUT OPTIMIZATION
+
+    given a puzzle, this function adds one obstacle, '#' to the puzzle at a time in every position.
+    When adding one position, check to see if our guard now enters an infinite loop
+    If it does, increase a counter and move the obstacle to the next position\n
+    returns a number of positions that caused the guard to enter an infinite loop    
+    '''
+    obstacle_counter = 0
+    part_2_puzzle = puzzleRead()
+
+    for i in range(len(part_2_puzzle)):
+        for j in range(len(part_2_puzzle[i])):
+            current_position = (i, j)
+            if part_2_puzzle[i][j] == '.':
+                # turn current position into an obstacle
+                part_2_puzzle[i][j] = '#'
+                print(f'Obstacle placed at position {current_position}')
+                if movingPartTwo(part_2_puzzle) == True:
+                    obstacle_counter += 1
+                    print(f'Guard has entered an infinite loop') # currently not working
+                else:
+                    print(f'Guard still left building')
+                    # turn obstacle back into an
+                    part_2_puzzle[i][j] = '.'
+
+part_2_puzzle = puzzleRead()
+
+addingObstacles(part_2_puzzle)
