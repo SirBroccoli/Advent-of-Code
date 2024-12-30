@@ -165,13 +165,9 @@ def walkingTheTrail(puzzle):
     Identifying any zero values as the start of the trailhead
     It will call checkinTheTrail function through recursion to identify connecting values that will
     lead to a 9 value through every iteration
-
-    // They trick part is getting the scoring
-    // how do we add the number of branches within the recursion to determine
-    // how many different peaks a single trail entrance ('0') leads to?
     '''
     peak_locations = {} # identify the top of the trailheads in x, y format
-    score = 0
+
     # iterate over the x axis
     for path_x in range(len(puzzle)):
         # print(path_x)
