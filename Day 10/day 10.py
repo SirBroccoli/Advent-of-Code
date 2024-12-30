@@ -90,9 +90,12 @@ Here's a larger example:
 32019012
 01329801
 10456732
-This larger example has 9 trailheads. Considering the trailheads in reading order, they have scores of 5, 6, 5, 3, 1, 3, 5, 3, and 5. Adding these scores together, the sum of the scores of all trailheads is 36.
+This larger example has 9 trailheads. Considering the trailheads 
+in reading order, they have scores of 5, 6, 5, 3, 1, 3, 5, 3, and 5. 
+Adding these scores together, the sum of the scores of all trailheads is 36.
 
-The reindeer gleefully carries over a protractor and adds it to the pile. What is the sum of the scores of all trailheads on your topographic map?
+The reindeer gleefully carries over a protractor and adds it to the pile. 
+What is the sum of the scores of all trailheads on your topographic map?
 '''
 
 
@@ -101,7 +104,7 @@ def puzzleReader():
         puzzle = [line.strip() for line in f.readlines()]
     return puzzle
 
-def checkingTheTrail(x, y, puzzle, peak_locations, score):
+def checkingTheTrail(x, y, puzzle, peak_locations, start_of_trail):
     '''
     this is the recursive function that will check north, south, east, and west
     if it identifies a value that is one greater than its current value,
@@ -116,65 +119,78 @@ def checkingTheTrail(x, y, puzzle, peak_locations, score):
     //Is a recursive function supposed to return anythin???
     // Do i need to add the puzzle text file as an argument if it will be inside of the walkingTheTrail function???
     '''
-    multiroutes = 0
+    
     current_position = int(puzzle[x][y])
     curr_coordinates = (int(x), int(y))
-    print(f'top of checkingTheTrail Function\ncurrent position is {x, y} {current_position}')
+    print(f'position {x, y} {current_position}')
 
-    # are we at the top of the trailhead after moving
-    # if it is equal to 9 and we haven't visited already
-    # add it to the peak_locations list 
-    if current_position == 9:
-        print('if current position is a 9')
-        print(peak_locations)
-        if curr_coordinates not in peak_locations:
+    if current_position == 9: 
+        print('Current position is a 9')
+        
+        # from the trail head (0), has this peak been visited before?
+        if start_of_trail not in peak_locations:
+            print('initializing peak_locations for start_of_trail')
+            peak_locations[start_of_trail] = []
+       
+        # a trail head (0) can visit a peak (curr_coordinates) many times, but only be considered one trail
+        # have we visited this peak from the trail head before?
+        # if not, add the peak value to the trail head Key
+        if curr_coordinates not in peak_locations[start_of_trail]:
             print('adding position to peak_locations')
-            peak_locations.append(curr_coordinates)
-            multiroutes += 1
-    
+            peak_locations[start_of_trail].append(curr_coordinates)
+
     # is north one value greater than our current position?
-    if x > 0:
-        north = puzzle[x-1][y]
-        if int(north) == int(current_position) + 1:
-            print('checking the north position')
-            checkingTheTrail(x - 1, y, puzzle, peak_locations, score)
+    if x > 0 and int(puzzle[x-1][y]) == int(current_position) + 1:
+        print('checking the north position')
+        checkingTheTrail(x - 1, y, puzzle, peak_locations, start_of_trail)
     
     # is East one value greater than our current position?
-    if y < 41:
-        east = puzzle[x][y+1]
-        if int(east) == int(current_position) + 1:
-            print('checking the east position')
-            checkingTheTrail(x, y+1, puzzle, peak_locations, score)
+    if y < len(puzzle)-1 and int(puzzle[x][y+1]) == int(current_position) + 1:
+        print('checking the east position')
+        checkingTheTrail(x, y+1, puzzle, peak_locations, start_of_trail)
 
     # is South one value greater than our current position?
-    if x < 41:
-        south = puzzle[x+1][y]
-        if int(south) == int(current_position) + 1:
-            print('checking the South position')
-            checkingTheTrail(x + 1, y, puzzle, peak_locations, score)
+    if x < len(puzzle)-1 and int(puzzle[x+1][y]) == int(current_position) + 1:
+        print('checking the South position')
+        checkingTheTrail(x + 1, y, puzzle, peak_locations, start_of_trail)
     
     # is West one value greater than our current position?  
-    if y > 0:
-        west = puzzle[x][y-1]
-        if int(west) == int(current_position) + 1:
-            print('moving the west position')
-            checkingTheTrail(x, y-1, puzzle, peak_locations, score)
-
-
+    if y > 0 and int(puzzle[x][y-1]) == int(current_position) + 1:
+        print('moving the west position')
+        checkingTheTrail(x, y-1, puzzle, peak_locations, start_of_trail)
+    
 def walkingTheTrail(puzzle):
-    peak_locations = [] # identify the top of the trailheads in x, y format
-    score = []
+    '''
+    iterates over the puzzle file,
+    Identifying any zero values as the start of the trailhead
+    It will call checkinTheTrail function through recursion to identify connecting values that will
+    lead to a 9 value through every iteration
+
+    // They trick part is getting the scoring
+    // how do we add the number of branches within the recursion to determine
+    // how many different peaks a single trail entrance ('0') leads to?
+    '''
+    peak_locations = {} # identify the top of the trailheads in x, y format
+    score = 0
     # iterate over the x axis
     for path_x in range(len(puzzle)):
         # print(path_x)
         # iteratign over the y axis
         for path_y in range(len(puzzle)):
+            position = puzzle[path_x][path_y]
+            base_head_coordinates = (path_x, path_y)
             if puzzle[path_x][path_y] == '0':
-                score += [checkingTheTrail(path_x, path_y, puzzle, peak_locations, score)]
+                checkingTheTrail(path_x, path_y, puzzle, peak_locations, base_head_coordinates)
+
     print(peak_locations)
-    return score
+    return peak_locations
+
 
 
 puzzle = puzzleReader()
+
 trailheads = walkingTheTrail(puzzle)
-print(trailheads)
+
+trail_score = sum(len(i) for i in trailheads.values())
+
+print(trail_score)
