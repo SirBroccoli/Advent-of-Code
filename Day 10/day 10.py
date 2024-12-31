@@ -324,4 +324,4 @@ def walkingTheTrailPartTwo(puzzle):
 part_two_puzzle = puzzleReader()
 trailheads_part_two = walkingTheTrailPartTwo(part_two_puzzle)
 total = sum(trailheads_part_two.values())
-print(total)
+print(total) # 1162
