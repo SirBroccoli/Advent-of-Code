@@ -268,7 +268,6 @@ def checkingTheTrailPartTwo(x, y, puzzle, peak_locations, start_of_trail):
     '''
     
     current_position = int(puzzle[x][y])
-    curr_coordinates = (int(x), int(y))
     print(f'position {x, y} {current_position}')
 
     if current_position == 9: 
@@ -278,11 +277,8 @@ def checkingTheTrailPartTwo(x, y, puzzle, peak_locations, start_of_trail):
         if start_of_trail not in peak_locations:
             print('initializing peak_locations for start_of_trail')
             peak_locations[start_of_trail] = 1
-       
-        # a trail head (0) can visit a peak (curr_coordinates) many times, but only be considered one trail
-        # have we visited this peak from the trail head before?
-        # if not, add the peak value to the trail head Key
-        # if curr_coordinates not in peak_locations[start_of_trail]:
+        
+        # otherwise add 1 that we have visited this peak
         else:
             print('adding position to peak_locations')
             peak_locations[start_of_trail] += 1
@@ -310,27 +306,22 @@ def walkingTheTrailPartTwo(puzzle):
     It will call checkinTheTrail function through recursion to identify connecting values that will
     lead to a 9 value through every iteration
     '''
-    peak_locations = {} # identify the top of the trailheads in x, y format
+    # identify the top of the trailheads in x, y format
+    # the key will be the starting trail head
+    # the value will be all of the peaks we visit starting at the trail head 
+    peak_locations = {} 
 
     # iterate over the x axis
     for path_x in range(len(puzzle)):
-        # print(path_x)
         # iteratign over the y axis
         for path_y in range(len(puzzle)):
             base_head_coordinates = (path_x, path_y)
             if puzzle[path_x][path_y] == '0':
                 checkingTheTrailPartTwo(path_x, path_y, puzzle, peak_locations, base_head_coordinates)
 
-    print(peak_locations)
     return peak_locations
 
 part_two_puzzle = puzzleReader()
-
 trailheads_part_two = walkingTheTrailPartTwo(part_two_puzzle)
-print(trailheads_part_two)
-print(trailheads_part_two.values())
-
-total = 0
-for i in trailheads_part_two.values():
-    total += 1
+total = sum(trailheads_part_two.values())
 print(total)
